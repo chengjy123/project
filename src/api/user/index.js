@@ -17,7 +17,7 @@ export default {
     let resp = await axios.put(`/api/users/${user.userId}`, user)
     return resp
   },
-  login:async(user) =>{
+  login:async (user) =>{
     let resp = await axios.post('/api/users/actions/login/',user)
     return resp
   }
