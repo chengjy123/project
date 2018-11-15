@@ -1,45 +1,49 @@
 <template>
   <div>
-    <OrgForm @queryUser="queryUser"></OrgForm>
-    <div style="float:left;width:80%;height:100%">
-      <div style="text-align: right;margin-bottom: 10px">
-        <el-button type="primary" @click="openDialog">新增</el-button>
-      </div>
-      <el-table border :data="userData">
-        <el-table-column label="用户名" prop="userName"></el-table-column>
-        <el-table-column label="密码" prop="userPassword"></el-table-column>
-        <el-table-column label="组织名" prop="orgName"></el-table-column>
-        <el-table-column label="操作" prop="userId">
-          <tamplate slot-scope="scope">
-            <el-button @click="update(scope.row)" type="success">
-              修改
-            </el-button>
-            <el-button @click="remove(scope.row.userId)" type="danger">
-              删除
-            </el-button>
-          </tamplate>
-        </el-table-column>
-      </el-table>
-      <div>
-        <el-pagination
-          layout="prev, pager, next"
-          :total="total"
-          @current-change="pageChange">
-        </el-pagination>
-      </div>
-      <UserForm :visible.sync="visible" @success="loadData" :optionData.sync="optionData" :updateData="updateData" :title="title"></UserForm><!--用":"表示为变量，否则为字符串-->
-    </div>
+    <el-container>
+      <el-aside width="20%"><OrgTree @queryUser="queryUser"></OrgTree></el-aside>
+      <el-main><div>
+        <div id="addButton">
+          <el-button type="primary" @click="openDialog">新增</el-button>
+        </div>
+        <el-table border :data="userData">
+          <el-table-column align='center' label="用户名" prop="userName"></el-table-column>
+          <el-table-column align='center' label="密码" prop="userPassword"></el-table-column>
+          <el-table-column align='center' label="组织名" prop="orgName"></el-table-column>
+          <el-table-column align='center' label="操作" prop="userId">
+            <tamplate slot-scope="scope">
+              <el-button @click="update(scope.row)" type="success">
+                修改
+              </el-button>
+              <el-button @click="remove(scope.row.userId)" type="danger">
+                删除
+              </el-button>
+            </tamplate>
+          </el-table-column>
+        </el-table>
+        <div class="pageStyle">
+          <el-pagination
+            layout="prev, pager, next"
+            :total="total"
+            @current-change="pageChange">
+          </el-pagination>
+        </div>
+        <UserForm :visible.sync="visible" @success="loadData"
+                  :orgData.sync="orgData" :formData="formData"
+                  :title="title" :orgId="query.orgId"></UserForm><!--用":"表示为变量，否则为字符串-->
+      </div></el-main>
+    </el-container>
   </div>
 </template>
 <script>
 import UserForm from './form.vue'
-import OrgForm from '@/views/org/index.vue'
-import UserApi from '@/api/user/user'
-import OrgApi from '@/api/org/org'
+import OrgTree from '@/views/org/tree.vue'
+import UserApi from '@/api/user'
+import OrgApi from '@/api/org'
 
 export default {
-  components: {UserForm,OrgForm},
-  props:{
+  components: {UserForm, OrgTree},
+  props: {
   },
   data () {
     return {
@@ -48,11 +52,11 @@ export default {
       title: '',
       userData: [], // 必须声明
       total: 0,
-      optionData:{
-        orgId :'',
-        orgName:''
+      orgData: {
+        orgId: '',
+        orgName: ''
       },
-      updateData: {
+      formData: {
         userId: '',
         userName: '',
         userPassword: '',
@@ -85,7 +89,7 @@ export default {
     },
     async openDialog () {
       let ret = await OrgApi.data('')
-      this.optionData = ret.data
+      this.orgData = ret.data
       this.visible = true
       this.title = '新增用户'
     },
@@ -100,7 +104,7 @@ export default {
         if (resp.data.code === 1) {
           this.$message({
             type: 'success',
-            message: '删除成功!'
+            message: resp.data.msg
           })
           this.loadData()
         }
@@ -111,8 +115,10 @@ export default {
         })
       })
     },
-    update (user) {
-      this.updateData = user
+    async update (user) {
+      let ret = await OrgApi.data('')
+      this.orgData = ret.data
+      this.formData = user
       this.visible = true
       this.title = '修改用户'
     },
@@ -120,7 +126,7 @@ export default {
       this.query.pageNumber = page
       this.loadData()
     },
-    queryUser(data){
+    queryUser (data) {
       this.query.orgId = data
       this.loadData()
     }
@@ -128,4 +134,11 @@ export default {
 }
 </script>
 <style>
+  #addButton{
+    text-align: right;
+    margin-bottom: 10px
+  }
+  .pageStyle{
+    text-align: center;
+  }
 </style>

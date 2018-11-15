@@ -1,10 +1,8 @@
-<!--suppress ALL -->
 <template>
 
   <el-dialog
     :visible.sync="visible"
     :title="title"
-    width="600px"
   >
     <div>
       <el-form ref="form" label-width="100px" :model="userForm" :rules="rules">
@@ -19,7 +17,7 @@
           <el-select v-model="userForm.orgId" clearable placeholder="请选择">
             <el-option key="0" label="请选择" value="0"></el-option>
             <el-option
-              v-for="item in options"
+              v-for="item in orgData"
               :key="item.orgId"
               :label="item.orgName"
               :value="item.orgId">
@@ -30,13 +28,14 @@
     </div>
     <div slot="footer">
       <el-button type="primary" @click="save">保存</el-button>
+      <el-button type="primary" @click="closeDialog">关闭</el-button>
     </div>
 </el-dialog>
 
 </template>
 <script>
-import UserApi from '@/api/user/user'
-import OrgApi from '@/api/org/org'
+import UserApi from '@/api/user'
+import OrgApi from '@/api/org'
 
 export default {
   props: {
@@ -47,8 +46,9 @@ export default {
     title: {
       type: String
     },
-    updateData : {},
-    optionData:{},
+    formData : {type:Object},
+    orgData:{type:Object},
+    orgId:{type:String},
     flag:{
       type: Number
     },
@@ -59,9 +59,10 @@ export default {
         userName: null,
         userPassword: null
       }
-      this.options = this.optionData
-      if(this.title=='修改用户'){
-        this.userForm = this.updateData
+      debugger
+      this.userForm.orgId = this.orgId
+      if(this.title==='修改用户'){
+        this.userForm = this.formData
       }
       if (!val) {
         this.$emit('update:visible', false)
@@ -80,10 +81,6 @@ export default {
     },
   data () {
     return {
-      options: {
-        orgId :'',
-        orgName:''
-      },
       rules: {
         userName: {
           required: true, message: '请输入用户名'
@@ -98,7 +95,8 @@ export default {
       userForm: {
         userName: null,
         userPassword: null,
-        orgId: ''
+        orgId: '',
+        userId: ''
       }
     }
   },
@@ -106,29 +104,25 @@ export default {
     save () {
       this.$refs['form'].validate(async valid => {
         if (valid) {
-          if(this.title=='修改用户') {
-            let record = await UserApi.modify(this.userForm)
-            if (record.data.code === 1) {
-              this.visible = false
-              this.$emit('success')
-              this.$message({
-                message: '修改成功',
-                type: 'success'
-              })
-            }
+          let record = null
+          if(this.userForm.userId!='' && this.userForm.userId!=null) {
+            record = await UserApi.modify(this.userForm)
           }else{
-            let record = await UserApi.create(this.userForm)
-            if (record.data.code === 1) {
-              this.visible = false
-              this.$emit('success')
-              this.$message({
-                message: '添加成功',
-                type: 'success'
-              })
-            }
+            record = await UserApi.create(this.userForm)
+          }
+          if (record.data.code === 1) {
+            this.visible = false
+            this.$emit('success')
+            this.$message({
+              message: record.data.msg,
+              type: 'success'
+            })
           }
         }
       })
+    },
+    closeDialog(){
+      this.visible = false
     }
   }
 }

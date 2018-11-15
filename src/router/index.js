@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Manager from '@/views/manager.vue'
 import login from '@/views/login.vue'
 import User from '@/views/user/index'
-import Org from '@/views/org/form'
+import Org from '@/views/org/index'
 
 Vue.use(Router)
 let router = new Router({
@@ -19,30 +19,30 @@ let router = new Router({
       children: [{
         path: '/user',
         component: User,
-        meta:['组织用户管理']
+        meta: ['组织用户管理']
       }, {
-        path: '/form',
+        path: '/org',
         component: Org,
-        meta:['组织管理']
+        meta: ['组织管理']
       }
       ]
     }
   ],
-  mode: "history"
+  mode: 'history'
 })
 
-//对每次访问之前都要先看是否已经登录
-router.beforeEach((to,from,next)=>{
-  if(to.path.startsWith('/login')){
-    window.sessionStorage.removeItem('access-token');
-    next();
-  }else{
-    let token = window.sessionStorage.getItem('access-token');
-    if(!token){
-      next({path:'/login'});
-    }else{
-      next();
+// 对每次访问之前都要先看是否已经登录
+router.beforeEach((to, from, next) => {
+  if (to.path.startsWith('/login')) {
+    window.sessionStorage.removeItem('access-token')
+    next()
+  } else {
+    let token = window.sessionStorage.getItem('access-token')
+    if (!token) {
+      next({path: '/login'})
+    } else {
+      next()
     }
   }
-});
+})
 export default router
