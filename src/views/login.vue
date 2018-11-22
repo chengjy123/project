@@ -45,7 +45,7 @@ export default {
       let result = await UserApi.login(data)
       if (result.data.code === 1) {
         sessionStorage.setItem('access-token', 'success')
-        this.$router.push({path: '/manager'})
+        this.$router.push({name: 'index'})
         this.userForm = {
           userPassword: '',
           userName: ''

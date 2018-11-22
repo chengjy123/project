@@ -15,7 +15,7 @@ import OrgApi from '@/api/org'
 export default {
   methods: {
     async loadData () {
-      let resp = await OrgApi.data('')
+      let resp = await OrgApi.getOrgs('')
       this.orgData = resp.data
     },
     formatter (row, column) {

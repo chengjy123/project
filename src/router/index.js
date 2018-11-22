@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Manager from '@/views/manager.vue'
+import index from '@/views/index.vue'
 import login from '@/views/login.vue'
 import User from '@/views/user/index'
 import Org from '@/views/org/index'
@@ -13,15 +13,15 @@ let router = new Router({
       component: login
     },
     {
-      path: '/manager',
-      name: 'manager',
-      component: Manager,
+      path: '/index',
+      name: 'index',
+      component: index,
       children: [{
-        path: '/user',
+        path: '/user-index',
         component: User,
         meta: ['组织用户管理']
       }, {
-        path: '/org',
+        path: '/org-index',
         component: Org,
         meta: ['组织管理']
       }
@@ -39,7 +39,7 @@ router.beforeEach((to, from, next) => {
   } else {
     let token = window.sessionStorage.getItem('access-token')
     if (!token) {
-      next({path: '/login'})
+      next({name: 'login'})
     } else {
       next()
     }

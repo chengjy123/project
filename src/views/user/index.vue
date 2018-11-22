@@ -1,18 +1,18 @@
 <template>
   <div>
     <el-container>
-      <el-aside width="20%"><OrgTree @queryUser="queryUser"></OrgTree></el-aside>
+      <el-aside width="20%"><Org-Tree @queryUser="queryUser"></Org-Tree></el-aside>
       <el-main><div>
         <div id="addButton">
           <el-button type="primary" @click="openDialog">新增</el-button>
         </div>
         <el-table border :data="userData">
-          <el-table-column align='center' label="用户名" prop="userName"></el-table-column>
-          <el-table-column align='center' label="密码" prop="userPassword"></el-table-column>
-          <el-table-column align='center' label="组织名" prop="orgName"></el-table-column>
-          <el-table-column align='center' label="操作" prop="userId">
+          <el-table-column label="用户名" prop="userName"></el-table-column>
+          <el-table-column label="密码" prop="userPassword"></el-table-column>
+          <el-table-column label="组织名" prop="orgName"></el-table-column>
+          <el-table-column label="操作" prop="userId">
             <tamplate slot-scope="scope">
-              <el-button @click="update(scope.row)" type="success">
+              <el-button @click="updateOpenDialog(scope.row)" type="success">
                 修改
               </el-button>
               <el-button @click="remove(scope.row.userId)" type="danger">
@@ -28,16 +28,16 @@
             @current-change="pageChange">
           </el-pagination>
         </div>
-        <UserForm :visible.sync="visible" @success="loadData"
+        <User-Form :visible.sync="visible" @success="loadData"
                   :orgData.sync="orgData" :formData="formData"
-                  :title="title" :orgId="query.orgId"></UserForm><!--用":"表示为变量，否则为字符串-->
+                  :title="title" :orgId="query.orgId"></User-Form><!--用":"表示为变量，否则为字符串-->
       </div></el-main>
     </el-container>
   </div>
 </template>
 <script>
-import UserForm from './form.vue'
-import OrgTree from '@/views/org/tree.vue'
+import UserForm from './user-form.vue'
+import OrgTree from '@/views/org/org-tree.vue'
 import UserApi from '@/api/user'
 import OrgApi from '@/api/org'
 
@@ -47,7 +47,6 @@ export default {
   },
   data () {
     return {
-      count: 1,
       visible: false,
       title: '',
       userData: [], // 必须声明
@@ -88,7 +87,7 @@ export default {
       this.total = resp.data.pageCount
     },
     async openDialog () {
-      let ret = await OrgApi.data('')
+      let ret = await OrgApi.getOrgs('')
       this.orgData = ret.data
       this.visible = true
       this.title = '新增用户'
@@ -100,7 +99,7 @@ export default {
         type: 'warning',
         center: true
       }).then(async () => {
-        let resp = await UserApi.remove(id)
+        let resp = await UserApi.removeUser(id)
         if (resp.data.code === 1) {
           this.$message({
             type: 'success',
@@ -115,8 +114,8 @@ export default {
         })
       })
     },
-    async update (user) {
-      let ret = await OrgApi.data('')
+    async updateOpenDialog (user) {
+      let ret = await OrgApi.getOrgs('')
       this.orgData = ret.data
       this.formData = user
       this.visible = true

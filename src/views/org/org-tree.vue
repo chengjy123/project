@@ -2,7 +2,7 @@
   <div>
     <el-button type="primary" size="mini" @click="addNode">新增组织</el-button>
     <el-tree
-      :props="props1"
+      :props="treeProps"
       :load="loadNode"
       :check-on-click-node="false"
       :check-strictly="true"
@@ -68,7 +68,7 @@ export default {
   data () {
     return {
       disabled: false,
-      props1: {
+      treeProps: {
         label: 'orgName',
         children: 'child',
         isLeaf: 'leaf'
@@ -105,7 +105,7 @@ export default {
     }
   },
   async mounted () {
-    let list = await OrgApi.data('')
+    let list = await OrgApi.getOrgs('')
     this.treeOrg = list.data
   },
   methods: {
@@ -113,9 +113,9 @@ export default {
       let treeData = []
       let res = []
       if (node.level === 0) {
-        res = await OrgApi.data(0)
+        res = await OrgApi.getOrgs(0)
       } else {
-        res = await OrgApi.data(node.data.orgId)
+        res = await OrgApi.getOrgs(node.data.orgId)
       }
       res.data.forEach(e => {
         treeData.push(e)
@@ -143,9 +143,9 @@ export default {
           debugger
           let record = []
           if (this.treeForm.orgId !== null && this.treeForm.orgId !== '') {
-            record = await OrgApi.modify(this.treeForm)
+            record = await OrgApi.modifyOrg(this.treeForm)
           } else {
-            record = await OrgApi.create(this.treeForm)
+            record = await OrgApi.createOrg(this.treeForm)
           }
           if (record.data.code === 1) {
             this.showFlag = false
@@ -153,15 +153,7 @@ export default {
               message: record.data.msg,
               type: 'success'
             })
-            let res = await OrgApi.data(0)
-            let treeData = []
-            res.data.forEach(e => {
-              treeData.push(e)
-            })
-            this.treeData = treeData
-            let list = await OrgApi.data('')
-            this.treeOrg = list.data
-            this.$refs['treeForm'].resetFields()
+            this.loadTree()
           }
         }
       })
@@ -173,21 +165,14 @@ export default {
         type: 'warning',
         center: true
       }).then(async () => {
-        let resp = await OrgApi.remove(data.orgId)
+        debugger
+        let resp = await OrgApi.removeOrg(data.orgId)
         if (resp.data.code === 1) {
           this.$message({
             type: 'success',
             message: resp.data.msg
           })
-          let res = await OrgApi.data(0)
-          let treeData = []
-          res.data.forEach(e => {
-            treeData.push(e)
-          })
-          this.treeData = treeData
-          let list = await OrgApi.data('')
-          this.treeOrg = list.data
-          this.$refs['treeForm'].resetFields()
+          this.loadTree()
         } else {
           this.$message({
             type: 'info',
@@ -214,6 +199,17 @@ export default {
     },
     close () {
       this.showFlag = false
+    },
+    async loadTree () {
+      let res = await OrgApi.getOrgs(0)
+      let treeData = []
+      res.data.forEach(e => {
+        treeData.push(e)
+      })
+      this.treeData = treeData
+      let list = await OrgApi.getOrgs('')
+      this.treeOrg = list.data
+      this.$refs['treeForm'].resetFields()
     }
   }
 }

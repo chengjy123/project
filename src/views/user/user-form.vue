@@ -35,7 +35,6 @@
 </template>
 <script>
 import UserApi from '@/api/user'
-import OrgApi from '@/api/org'
 
 export default {
   props: {
@@ -46,12 +45,18 @@ export default {
     title: {
       type: String
     },
-    formData : {type:Object},
-    orgData:{type:Object},
-    orgId:{type:String},
-    flag:{
-      type: Number
+    formData: {
+      type: Object
     },
+    orgData: {
+      type: Object
+    },
+    orgId: {
+      type: String
+    },
+    flag: {
+      type: Number
+    }
   },
   watch: {
     visible (val) {
@@ -59,14 +64,13 @@ export default {
         userName: null,
         userPassword: null
       }
-      debugger
       this.userForm.orgId = this.orgId
-      if(this.title==='修改用户'){
+      if (this.formData.userId) {
         this.userForm = this.formData
       }
       if (!val) {
         this.$emit('update:visible', false)
-        if(this.title=='新增用户'){
+        if (this.title === '新增用户') {
           this.userForm = {
             userName: null,
             userPassword: null
@@ -76,9 +80,9 @@ export default {
       }
     }
   },
-   async mounted (){
+  async mounted () {
 
-    },
+  },
   data () {
     return {
       rules: {
@@ -104,14 +108,15 @@ export default {
     save () {
       this.$refs['form'].validate(async valid => {
         if (valid) {
+          debugger
           let record = null
-          if(this.userForm.userId!='' && this.userForm.userId!=null) {
-            record = await UserApi.modify(this.userForm)
-          }else{
-            record = await UserApi.create(this.userForm)
+          if (this.userForm.userId) {
+            record = await UserApi.modifyUser(this.userForm)
+          } else {
+            record = await UserApi.createUser(this.userForm)
           }
           if (record.data.code === 1) {
-            this.visible = false
+            this.closeDialog()
             this.$emit('success')
             this.$message({
               message: record.data.msg,
@@ -121,7 +126,7 @@ export default {
         }
       })
     },
-    closeDialog(){
+    closeDialog () {
       this.visible = false
     }
   }

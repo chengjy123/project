@@ -7,12 +7,12 @@
                  text-color="#fff"
                  active-text-color="#ffd04b"
         class="el-menu">
-          <el-menu-item index="manager"><i></i>首页</el-menu-item>
+          <el-menu-item index="index"><i></i>首页</el-menu-item>
           <!--<el-submenu index="2">-->
             <!--<template slot="title"><i></i>后台管理</template>-->
             <!--<el-menu-item index="user">用户列表</el-menu-item>-->
           <!--</el-submenu>-->
-          <el-menu-item index="user">用户列表</el-menu-item>
+          <el-menu-item index="user-index">用户列表</el-menu-item>
         </el-menu>
       </el-col>
       <el-col :span="20">
@@ -34,7 +34,7 @@ export default {
     height: 100%
   }
   .el-menu{
-    height: 580q;
+    height: 580px;
     text-align: center
   }
 </style>
